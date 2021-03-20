@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>three.js css3d - periodic table</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			a {
+				color: #8ff;
+			}
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+			}
+
+			.element {
+				width: 120px;
+				height: 160px;
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+				border: 1px solid rgba(127,255,255,0.25);
+				font-family: Helvetica, sans-serif;
+				text-align: center;
+				line-height: normal;
+				cursor: default;
+			}
+
+			.element:hover {
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+				border: 1px solid rgba(127,255,255,0.75);
+			}
+
+				.element .number {
+					position: absolute;
+					top: 20px;
+					right: 20px;
+					font-size: 12px;
+					color: rgba(127,255,255,0.75);
+				}
+
+				.element .symbol {
+					position: absolute;
+					top: 40px;
+					left: 0px;
+					right: 0px;
+					font-size: 60px;
+					font-weight: bold;
+					color: rgba(255,255,255,0.75);
+					text-shadow: 0 0 10px rgba(0,255,255,0.95);
+				}
+
+				.element .details {
+					position: absolute;
+					bottom: 15px;
+					left: 0px;
+					right: 0px;
+					font-size: 12px;
+					color: rgba(127,255,255,0.75);
+				}
+
+			button {
+				color: rgba(127,255,255,0.75);
+				background: transparent;
+				outline: 1px solid rgba(127,255,255,0.75);
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,0.75);
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>Devarajan</div>
+		<div id="container"></div>
+		<div id="menu">
+			<button id="table">TABLE</button>
+			<button id="sphere">SPHERE</button>
+			<button id="helix">HELIX</button>
+			<button id="grid">GRID</button>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+
+			const table = [
+		    	"Rumpa", "23", "$F", 1, 1,
+				"Uveness", "25", "M", 18, 1,
+				"Hari", "25", "M", 1, 2,
+				"Mila", "41", "F", 2, 2,
+				"Salam", "27", "M", 13, 2,
+				"Abu", "43", "M", 14, 2,
+				"Jas", "24", "F", 15, 2,
+				"Shobna", "23", "F", 16, 2,
+				"Jane", "27", "F", 17, 2,
+				"Jaber", "26", "M", 18, 2,
+				"Kirt", "23", "F", 1, 3,
+				"Ware", "41", "F", 2, 3,
+				"Ervin", "36", "F", 13, 3,
+				"Teejan", "26", "M", 14, 3,
+				"Setu", "27", "F", 15, 3,
+				"Rao", "27", "M", 16, 3,
+				"Khan", "28", "M", 17, 3,
+				"Moga", "25", "F", 18, 3,
+				"Veena", "28", "F", 1, 4,
+				"Shri", "24", "F", 2, 4,
+				"Vienod", "25", "M", 3, 4,
+				"Sujon", "26", "M", 4, 4,
+				"Raj", "26", "M", 5, 4,
+				"Jeev", "25", "F", 6, 4,
+				"Navi", "24", "F", 7, 4,
+				"Jena", "26", "M", 8, 4,
+				"Vano", "26", "M", 9, 4,
+				"Meera", "29", "F", 10, 4,
+				"Fong", "26", "M", 11, 4,
+				"Sang", "45", "F", 12, 4,
+				"Valar", "25", "F", 13, 4,
+				"Moinul", "25", "M", 14, 4,
+				"Divya", "25", "F", 15, 4,
+				"Darsh", "23", "F", 16, 4,
+				"Deva", "25", "M", 17, 4,
+				"Saktis", "26", "M", 18, 4,
+				"Prav", "28", "F", 1, 5,
+				"Arvind", "26", "M", 2, 5,
+				"Tadiwa", "46", "M", 3, 5,
+				"Jae", "26", "F", 4, 5,
+				"Kowsar", "30", "M", 5, 5,
+				"Priv", "26", "M", 6, 5,
+				"Thamil", "31", "F", 7, 5,
+				"Dhivega", "21", "F", 8, 5,
+				"Alamin", "28", "M", 9, 5,
+				"Sasi", "27", "M", 10, 5,
+				"Vidya", "29", "F", 11, 5,
+				"Pravena", "23", "F", 12, 5,
+				"Kumar", "27", "M", 13, 5,
+				"Veni", "27", "F", 14, 5,
+				"Malani", "29", "F", 15, 5,
+				"Sherwin", "26", "M", 16, 5,
+				"Vero", "26", "F", 17, 5,
+				"Thula", "29", "F", 18, 5,
+				"Bismi", "24", "M", 1, 6,
+				"Hema", "26", "F", 2, 6,
+				"Agi", "23", "F", 4, 9,
+				"Suhaila", "46", "F", 5, 9,
+				"Tirga", "25", "F", 6, 9,
+				"Yugen", "28", "M", 7, 9,
+				"Ruve", "25", "M", 8, 9,
+				"Kriya", "21", "F", 9, 9,
+				"Kasan", "22", "F", 10, 9,
+				"Jaya", "26", "M", 11, 9,
+				"Hisika", "35", "F", 12, 9,
+				"Premala", "27", "F", 13, 9,
+				"Selvi", "47", "F", 14, 9,
+				"Ayoub", "24", "M", 15, 9,
+				"Suldan", "25", "M", 16, 9,
+				"Kaja", "24", "F", 17, 9,
+				"Jovan", "27", "F", 18, 9,
+				"Kanaga", "21", "F", 4, 6,
+				"Rose", "25", "F", 5, 6,
+				"Puva", "25", "F", 6, 6,
+				"Ashini", "28", "F", 7, 6,
+				"Ratana", "24", "F", 8, 6,
+				"Tara", "26", "F", 9, 6,
+				"Kishan", "23", "M", 10, 6,
+				"Sajee", "29", "F", 11, 6,
+				"Indra", "34", "F", 12, 6,
+				"Kuna", "32", "F", 13, 6,
+				"Toma", "22", "F", 14, 6,
+				"Woo", "45", "F", 15, 6,
+				"Suba", "21", "F", 16, 6,
+				"Devi", "28", "F", 17, 6,
+				"Ruban", "23", "M", 18, 6,
+				"Vani", "37", "F", 1, 7,
+				"Satran", "26", "M", 2, 7,
+				"Gaya", "34", "F", 4, 10,
+				"Johan", "23", "M", 5, 10,
+				"Joa", "21", "F", 6, 10,
+				"Navin", "25", "M", 7, 10,
+				"Ekmal", "26", "M", 8, 10,
+				"Faiz", "26", "M", 9, 10,
+				"Sara", "25", "F", 10, 10,
+				"Sharvi", "28", "M", 11, 10,
+				"Logen", "27", "M", 12, 10,
+				"Tan", "26", "M", 13, 10,
+				"Ying", "26", "F", 14, 10,
+				"Tarani", "23", "F", 15, 10,
+				"Jessy", "32", "F", 16, 10,
+				"Jun", "45", "M", 17, 10,
+				"Yen", "34", "F", 18, 10,
+				"Gan", "28", "M", 4, 7,
+				"Mark", "26", "M", 5, 7,
+				"Ruby", "25", "F", 6, 7,
+				"Rathi", "42", "F", 7, 7,
+				"Maria", "23", "F", 8, 7,
+				"Radha", "25", "M", 9, 7,
+				"Sara", "29", "M", 10, 7,
+				"Yogaa", "27", "F", 11, 7,
+				"Tina", "43", "F", 12, 7,
+				"Malar", "25", "F", 13, 7,
+				"Pamela", "28", "F", 14, 7,
+				"Ragini", "21", "F", 15, 7,
+				"Thara", "34", "F", 16, 7,
+				"Rubeni", "28", "F", 17, 7,
+				"Lina", "34", "F", 18, 7
+			];
+
+			let camera, scene, renderer;
+			let controls;
+
+			const objects = [];
+			const targets = { table: [], sphere: [], helix: [], grid: [] };
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3000;
+
+				scene = new THREE.Scene();
+
+				// table
+
+				for ( let i = 0; i < table.length; i += 5 ) {
+
+					const element = document.createElement( 'div' );
+					element.className = 'element';
+					element.style.backgroundColor = 'rgba(255,105,180'  + ( Math.random() * 0.5 + 0.25 ) + ')';
+					
+
+					const number = document.createElement( 'div' );
+					number.className = 'number';
+					number.textContent = ( i / 5 ) + 1;
+					element.appendChild( number );
+
+					const symbol = document.createElement( 'div' );
+					symbol.className = 'symbol';
+					symbol.textContent = table[ i ];
+					element.appendChild( symbol );
+
+					const details = document.createElement( 'div' );
+					details.className = 'details';
+					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
+					element.appendChild( details );
+
+					const objectCSS = new CSS3DObject( element );
+					objectCSS.position.x = Math.random() * 4000 - 2000;
+					objectCSS.position.y = Math.random() * 4000 - 2000;
+					objectCSS.position.z = Math.random() * 4000 - 2000;
+					scene.add( objectCSS );
+
+					objects.push( objectCSS );
+
+					//
+
+					const object = new THREE.Object3D();
+					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
+					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
+
+					targets.table.push( object );
+
+				}
+
+				// sphere
+
+				const vector = new THREE.Vector3();
+
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+					const phi = Math.acos( - 1 + ( 2 * i ) / l );
+					const theta = Math.sqrt( l * Math.PI ) * phi;
+
+					const object = new THREE.Object3D();
+
+					object.position.setFromSphericalCoords( 800, phi, theta );
+
+					vector.copy( object.position ).multiplyScalar( 2 );
+
+					object.lookAt( vector );
+
+					targets.sphere.push( object );
+
+				}
+
+				// helix
+
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+					const theta = i * 0.175 + Math.PI;
+					const y = - ( i * 8 ) + 450;
+
+					const object = new THREE.Object3D();
+
+					object.position.setFromCylindricalCoords( 900, theta, y );
+
+					vector.x = object.position.x * 2;
+					vector.y = object.position.y;
+					vector.z = object.position.z * 2;
+
+					object.lookAt( vector );
+
+					targets.helix.push( object );
+
+				}
+
+				// grid
+
+				for ( let i = 0; i < objects.length; i ++ ) {
+
+					const object = new THREE.Object3D();
+
+					object.position.x = ( ( i % 5 ) * 400 ) - 800;
+					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
+					object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
+
+					targets.grid.push( object );
+
+				}
+
+				//
+
+				renderer = new CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				//
+
+				controls = new TrackballControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 6000;
+				controls.addEventListener( 'change', render );
+
+				const buttonTable = document.getElementById( 'table' );
+				buttonTable.addEventListener( 'click', function () {
+
+					transform( targets.table, 2000 );
+
+				} );
+
+				const buttonSphere = document.getElementById( 'sphere' );
+				buttonSphere.addEventListener( 'click', function () {
+
+					transform( targets.sphere, 2000 );
+
+				} );
+
+				const buttonHelix = document.getElementById( 'helix' );
+				buttonHelix.addEventListener( 'click', function () {
+
+					transform( targets.helix, 2000 );
+
+				} );
+
+				const buttonGrid = document.getElementById( 'grid' );
+				buttonGrid.addEventListener( 'click', function () {
+
+					transform( targets.grid, 2000 );
+
+				} );
+
+				transform( targets.table, 2000 );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function transform( targets, duration ) {
+
+				TWEEN.removeAll();
+
+				for ( let i = 0; i < objects.length; i ++ ) {
+
+					const object = objects[ i ];
+					const target = targets[ i ];
+
+					new TWEEN.Tween( object.position )
+						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+					new TWEEN.Tween( object.rotation )
+						.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+				}
+
+				new TWEEN.Tween( this )
+					.to( {}, duration * 2 )
+					.onUpdate( render )
+					.start();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				TWEEN.update();
+
+				controls.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
